@@ -30,27 +30,31 @@
       <origin rpy="0 0 0" xyz="0.0623 0 0"/>   
     </visual>
   </link>
-
+  
     <link name="leg_link">
     <visual>
       <geometry>
         <cylinder length="0.14" radius="0.0127"/>
       </geometry>
       <material name="white"/>
-      <origin rpy="0 0 0" xyz="0 0 -0.03"/>   
+      <origin rpy="0 0 0" xyz="0 0 -0.06"/>   
     </visual>
   </link>
 
-  <joint name="hip_to_thigh" type="fixed">
+  <joint name="hip_to_thigh" type="revolute">
     <parent link="base_link"/>
     <child link="thigh_link"/>
     <origin xyz="0 0 -0.03"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="1000.0" lower="-0.785" upper="0.785" velocity="0.5"/>    
   </joint>
 
-  <joint name="thigh_to_leg" type="fixed">
+  <joint name="thigh_to_leg" type="revolute">
     <parent link="thigh_link"/>
     <child link="leg_link"/>
-    <origin xyz="0.1246 0 -0.051 "/>
+    <origin xyz="0.1246 0 -0.021 "/>
+    <axis xyz="0 1 0"/>
+    <limit effort="1000.0" lower="-0.785" upper="0.785" velocity="0.5"/>
   </joint>
 
 </robot>
