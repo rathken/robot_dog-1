@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="quadruped">
+  <!-- ############################################ 
+       include other xacro files
+       ############################################ -->
+  <xacro:include filename="$(cwd)/urdf/colors.xacro" />
+  <xacro:include filename="$(cwd)/urdf/macros.xacro" />
+  
+  <!-- ############################################ 
+       Parameters
+       ############################################ -->
+  
+  <xacro:property name="bodywidth"       value="0.20" />
+  <xacro:property name="bodylen"         value="0.31" />
+  <xacro:property name="bodythick"       value="0.006" />
+  <xacro:property name="legbaseoffset"   value="0.053" />
+
+  <!-- ############################################ 
+       Base
+       ############################################ -->
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="${bodylen} ${bodywidth} ${bodythick}"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0"/>   
+      <material name="white"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${bodylen} ${bodywidth} ${bodythick}"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0"/>   
+    </collision>
+  </link>
+
+  
+  <!-- ############################################ 
+       leg - front left
+       ############################################ -->  
+
+  <xacro:servo suffix="front_left"></xacro:servo>
+
+  <joint name="base_front_left_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="servo_front_left_link"/>
+    <origin xyz="${bodylen/2-servolen/2} ${bodywidth/2-servowidth/2} -${legbaseoffset}"/>
+    <axis xyz="1 0 0" />
+    <limit effort="${servo_effort}" lower="-0.785" upper="0.785" velocity="${servo_velocity}"/>
+  </joint>
+
+  <!-- ############################################ 
+       leg - front right
+       ############################################ -->  
+
+  <xacro:servo suffix="front_right"></xacro:servo>
+
+  <joint name="base_front_right_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="servo_front_right_link"/>
+    <origin xyz="${bodylen/2-servolen/2} -${bodywidth/2-servowidth/2} -${legbaseoffset}"/>
+    <axis xyz="1 0 0" />
+    <limit effort="${servo_effort}" lower="-0.785" upper="0.785" velocity="${servo_velocity}"/>
+  </joint>
+
+  <!-- ############################################ 
+       leg - rear left
+       ############################################ -->  
+
+  <xacro:servo suffix="rear_left"></xacro:servo>
+
+  <joint name="base_rear_left_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="servo_rear_left_link"/>
+    <origin xyz="-${bodylen/2-servolen/2} ${bodywidth/2-servowidth/2} -${legbaseoffset}"/>
+    <axis xyz="1 0 0" />
+    <limit effort="${servo_effort}" lower="-0.785" upper="0.785" velocity="${servo_velocity}"/>
+  </joint>
+
+  <!-- ############################################ 
+       leg - rear right
+       ############################################ -->  
+
+  <xacro:servo suffix="rear_right"></xacro:servo>
+
+  <joint name="base_rear_right_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="servo_rear_right_link"/>
+    <origin xyz="-${bodylen/2-servolen/2} -${bodywidth/2-servowidth/2} -${legbaseoffset}"/>
+    <axis xyz="1 0 0" />
+    <limit effort="${servo_effort}" lower="-0.785" upper="0.785" velocity="${servo_velocity}"/>
+  </joint>  
+</robot> 

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="one_leg">
+  <!-- ############################################ 
+       include other xacro files
+       ############################################ -->
+  <xacro:include filename="$(cwd)/urdf/colors.xacro" />
+  <xacro:include filename="$(cwd)/urdf/macros.xacro" />
+
+  <!-- ############################################ 
+       calling macro
+       ############################################ -->
+  <link name="base_link">
+     <visual>
+      <geometry>
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0"/>   
+      <material name="white"/>
+    </visual>
+  </link>
+
+  <xacro:leg prefix="only"></xacro:leg>
+
+  <joint name="hip_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="only_hip_link"/>
+    <origin xyz="0 0 0"/>
+  </joint>
+
+</robot>

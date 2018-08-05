@@ -19,7 +19,19 @@
       <origin rpy="0 0 0" xyz="0 0 0.0"/>   
       <material name="blue"/>
     </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.045" radius="0.0127"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0"/>   
+      <material name="blue"/>
+    </collision>    
+    <inertial>
+      <mass value="0.03"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
   </link>
+
   
   <link name="thigh_link">
     <visual>
@@ -29,6 +41,17 @@
       <material name="white"/>
       <origin rpy="0 0 0" xyz="0.0623 0 0"/>   
     </visual>
+    <collision>
+      <geometry>
+        <box size="0.15 0.035 0.006"/>
+      </geometry>
+      <material name="white"/>
+      <origin rpy="0 0 0" xyz="0.0623 0 0"/>   
+    </collision>
+    <inertial>
+      <mass value="0.03"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>
   </link>
   
     <link name="leg_link">
@@ -39,6 +62,17 @@
       <material name="white"/>
       <origin rpy="0 0 0" xyz="0 0 -0.06"/>   
     </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.14" radius="0.0127"/>
+      </geometry>
+      <material name="white"/>
+      <origin rpy="0 0 0" xyz="0 0 -0.06"/>   
+    </collision>    
+    <inertial>
+      <mass value="0.03"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+    </inertial>    
   </link>
 
   <joint name="hip_to_thigh" type="revolute">

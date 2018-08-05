@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="servo">
+
+  <material name="blue">
+    <color rgba="0 0 0.8 1"/>
+  </material>
+  <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+
+  <xacro:property name="servowidth" value="0.04" />
+  <xacro:property name="servolen"   value="0.04" />
+  <xacro:property name="servothick" value="0.02" />
+  <!-- ############################################ 
+       Base
+       ############################################ -->
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="${servolen} ${servowidth} ${servothick}"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0"/>   
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${servolen} ${servowidth} ${servothick}"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.0"/>   
+    </collision>
+  </link>
+</robot> 
