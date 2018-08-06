@@ -132,4 +132,17 @@
       <limit effort="${servo_effort}" lower="${min_angle_leg_joint}" upper="${max_angle_leg_joint}" velocity="${servo_velocity}"/>
     </joint>
   </xacro:macro>
+
+  <!-- ############################################ 
+       Macro - left leg
+       ############################################ -->
+  <xacro:macro name="left_leg" params="prefix">    
+    <xacro:servo suffix="${prefix}"></xacro:servo>
+    <xacro:leg prefix="${prefix}"></xacro:leg>
+    <joint name="${prefix}_hip_joint" type="fixed">
+      <parent link="servo_${prefix}_link"/>
+      <child link="${prefix}_hip_link"/>
+      <origin xyz="0 0 0"/>
+    </joint>
+  </xacro:macro>
 </robot>

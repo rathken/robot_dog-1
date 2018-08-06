@@ -40,11 +40,10 @@
        leg - front left
        ############################################ -->  
 
-  <xacro:servo suffix="front_left"></xacro:servo>
-
+  <xacro:leg prefix="front_left"></xacro:leg>
   <joint name="base_front_left_joint" type="revolute">
     <parent link="base_link"/>
-    <child link="servo_front_left_link"/>
+    <child link="front_left_hip_link"/>
     <origin xyz="${bodylen/2-servolen/2} ${bodywidth/2-servowidth/2} -${legbaseoffset}"/>
     <axis xyz="1 0 0" />
     <limit effort="${servo_effort}" lower="-0.785" upper="0.785" velocity="${servo_velocity}"/>
@@ -54,13 +53,13 @@
        leg - front right
        ############################################ -->  
 
-  <xacro:servo suffix="front_right"></xacro:servo>
+  <xacro:leg prefix="front_right"></xacro:leg>
 
   <joint name="base_front_right_joint" type="revolute">
     <parent link="base_link"/>
-    <child link="servo_front_right_link"/>
+    <child link="front_right_hip_link"/>
     <origin xyz="${bodylen/2-servolen/2} -${bodywidth/2-servowidth/2} -${legbaseoffset}"/>
-    <axis xyz="1 0 0" />
+    <axis xyz="-1 0 0" />
     <limit effort="${servo_effort}" lower="-0.785" upper="0.785" velocity="${servo_velocity}"/>
   </joint>
 
@@ -68,11 +67,11 @@
        leg - rear left
        ############################################ -->  
 
-  <xacro:servo suffix="rear_left"></xacro:servo>
+  <xacro:leg prefix="rear_left"></xacro:leg>
 
   <joint name="base_rear_left_joint" type="revolute">
     <parent link="base_link"/>
-    <child link="servo_rear_left_link"/>
+    <child link="rear_left_hip_link"/>
     <origin xyz="-${bodylen/2-servolen/2} ${bodywidth/2-servowidth/2} -${legbaseoffset}"/>
     <axis xyz="1 0 0" />
     <limit effort="${servo_effort}" lower="-0.785" upper="0.785" velocity="${servo_velocity}"/>
@@ -82,13 +81,13 @@
        leg - rear right
        ############################################ -->  
 
-  <xacro:servo suffix="rear_right"></xacro:servo>
+  <xacro:leg prefix="rear_right"></xacro:leg>
 
   <joint name="base_rear_right_joint" type="revolute">
     <parent link="base_link"/>
-    <child link="servo_rear_right_link"/>
+    <child link="rear_right_hip_link"/>
     <origin xyz="-${bodylen/2-servolen/2} -${bodywidth/2-servowidth/2} -${legbaseoffset}"/>
-    <axis xyz="1 0 0" />
+    <axis xyz="-1 0 0" />
     <limit effort="${servo_effort}" lower="-0.785" upper="0.785" velocity="${servo_velocity}"/>
   </joint>  
 </robot> 
