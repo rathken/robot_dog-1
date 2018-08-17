@@ -14,7 +14,7 @@
   <xacro:property name="bodylen"         value="0.31" />
   <xacro:property name="bodythick"       value="0.006" />
   <xacro:property name="legbaseoffset"   value="0.053" />
-
+  <xacro:property name="body_mass"       value="2" />  
   <!-- ############################################ 
        Base
        ############################################ -->
@@ -33,6 +33,10 @@
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.0"/>   
     </collision>
+      <inertial>
+        <mass value="${body_mass}"/>
+        <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.2"/>
+      </inertial>
   </link>
 
   

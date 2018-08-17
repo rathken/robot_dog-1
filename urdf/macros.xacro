@@ -7,7 +7,7 @@
   <xacro:property name="servowidth"      value="0.04" />
   <xacro:property name="servolen"        value="0.04" />
   <xacro:property name="servothick"      value="0.02" />
-  <xacro:property name="servo_velocity"  value="0.5" />
+  <xacro:property name="servo_velocity"  value="${60/180*pi/0.16}" />
   <xacro:property name="servo_effort"    value="1000.0" />  
 
   <xacro:macro name="servo" params="suffix">
@@ -40,7 +40,7 @@
   <xacro:property name="thigh_thickness"  value="0.006" />
   <xacro:property name="thigh_mass"       value="0.03" />
   <xacro:property name="x_offset_hip_to_thigh" value="0.023" />
-  <xacro:property name="servo_velocity"  value="0.5" />
+  <xacro:property name="servo_velocity"  value="${60/180*pi/0.16}" />
   <xacro:property name="servo_effort"    value="1000.0" />
   <xacro:property name="gap_hip_to_thigh" value="0.015" />
   <xacro:property name="min_angle_thigh_joint" value="-0.5" />

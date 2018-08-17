@@ -10,13 +10,13 @@ cubeStartPos = [0,0,1]
 cubeStartOrientation = p.getQuaternionFromEuler([0,0,0])
 boxId = p.loadURDF("one_leg.urdf",cubeStartPos, cubeStartOrientation)
 
-#for i in range (10000):
-#  p.stepSimulation()
-#  time.sleep(1./240.)
-#cubePos, cubeOrn = p.getBasePositionAndOrientation(boxId)
-#print(cubePos,cubeOrn)
-p.setRealTimeSimulation(1)
 for i in range (10000):
   p.stepSimulation()
   time.sleep(1./240.)
+cubePos, cubeOrn = p.getBasePositionAndOrientation(boxId)
+print(cubePos,cubeOrn)
+#p.setRealTimeSimulation(1)
+#for i in range (10000):
+#  p.stepSimulation()
+#  time.sleep(1./240.)
 p.disconnect()
