@@ -11,7 +11,7 @@ String tempStr="";
 
 void setup() {
   Serial.begin(BAUDRATE);
-  printBootMessage();
+  Serial.println(String(STR_BOOT_MSG));
   c.sendOK();
 }
 
@@ -33,9 +33,9 @@ void loop() {
       case '\n':
               if (ch != '\n') { tempStr+='\n'; }
               if (tempStr.length() > MAX_LINE_SIZE) {
-                Serial.println("Commad line is too long (>"+String(MAX_LINE_SIZE)+")");
+                Serial.println("Command is too long (>"+String(MAX_LINE_SIZE)+")");
               } else if (tempStr.length()==0) {
-                Serial.println("Command line is too short (0 character)");    
+                Serial.println(String(STR_CMD_TOO_SHORT));    
               } else {
                 c.appendCommand(tempStr);
               }
@@ -50,10 +50,4 @@ void loop() {
     } else {  // command buffer is full. do nothing
     }
   }
-}
-  
-void printBootMessage() {
-  Serial.println("echo: Robot Console");
-  Serial.println("echo: Version: " + String(STR_VERSION));
-  Serial.println("echo: Author : " + String(STR_AUTHOR));
 }
