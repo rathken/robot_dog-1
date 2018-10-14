@@ -13,4 +13,3 @@
 #define MAX_LINE_SIZE 30
 #define NUM_ENTRY  20
 
-#define STR_CMD_TOO_SHORT "Command is too short (0 character)"
