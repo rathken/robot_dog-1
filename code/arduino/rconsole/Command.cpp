@@ -10,7 +10,6 @@ Command::Command() {
   inProgress=false;
   cmd="";
   cmdIdx=0;
-  readingCmd="";
 }
 
 void Command::parseCmd(void) {
@@ -23,11 +22,9 @@ void Command::parseCmd(void) {
   // R-code
   //=========================================================================================
   if ((cmd.charAt(0) == 'r')||(cmd.charAt(0) == 'R')) {
-    //    Serial.println("G-code found");
-   
     codeNum=findString('r',0);
     switch(codeNum) {
-    case 0: // Go to coordinate
+    case 0: 
       inProgress=true;
       Serial.println("R0");
       inProgress=false;
@@ -114,9 +111,9 @@ void Command::copyCmdBuffer(void) {
   }
 }
 
-void Command::appendCommand(void) {
-  readingCmd.toCharArray(cmdBuffer[cmdIdx],MAX_LINE_SIZE);
-  cmdBuffer[cmdIdx][readingCmd.length()]=0x00;          // null character at the end
+void Command::appendCommand(String &c) {
+  c.toCharArray(cmdBuffer[cmdIdx],MAX_LINE_SIZE);
+  cmdBuffer[cmdIdx][c.length()]=0x00;          // null character at the end
   cmdIdx++;
 }
 

@@ -24,7 +24,6 @@ class Command {
     void parseCmd(void);
     void removeFirstEntry(void);
   public:
-    String readingCmd;                             // buffer storing command from serial port. 
     Command(); 
     void showCommands(void);    // R999
     bool isInProgress(void) {  return inProgress;};
@@ -32,8 +31,7 @@ class Command {
     bool isEmpty(void) { return (cmdIdx==0);};
     bool isFull(void) { return (cmdIdx>=NUM_ENTRY);};
     volatile int getIndex(void) { return cmdIdx;};
-    void appendChar(int ch) {  readingCmd+=(char) ch;};
-    void appendCommand(void);
+    void appendCommand(String &c);
     void processFirstCmd(void);
 };
 
