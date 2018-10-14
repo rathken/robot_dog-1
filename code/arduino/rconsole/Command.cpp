@@ -52,6 +52,7 @@ void Command::showCommands(void) {
   Serial.println("R0 [motor number] [motor angle]      : go to position");
   Serial.println("R999                                 : show commands");
 }
+
 int Command::findString(char ch,int index) {
   return findStringProc(ch,index).toInt();
 }
@@ -82,9 +83,7 @@ String Command::findStringProc(char ch, int index) {
   }
   return temp;
 }
-bool Command::isInProgress(void) {
-  return inProgress;
-}
+
 void Command::removeComments(void) {
   int idxCh;
   String temp;
@@ -97,15 +96,6 @@ void Command::removeComments(void) {
     temp=cmd.substring(0,idxCh); // remove comments after ';'
     cmd=temp;
   }
-}
-void Command::printCmd(void) {
-#ifdef DEBUG_MODE  
-  Serial.println("Command : " +cmd);
-#endif
-}
-
-void Command::sendOK(void) {
-  Serial.println("ok\n");
 }
 
 void Command::removeFirstEntry(void) {
@@ -124,13 +114,20 @@ void Command::copyCmdBuffer(void) {
   }
 }
 
-void Command::clearCmd(void) {
-  cmd="";
-}
-
 void Command::appendCommand(void) {
   readingCmd.toCharArray(cmdBuffer[cmdIdx],MAX_LINE_SIZE);
   cmdBuffer[cmdIdx][readingCmd.length()]=0x00;          // null character at the end
   cmdIdx++;
+}
+
+void Command::processFirstCmd(void) {
+  copyCmdBuffer();
+  removeComments();
+  #ifdef DEBUG_MODE  
+    Serial.println("Command : "+cmd);
+  #endif
+  parseCmd();
+  cmd="";
+  removeFirstEntry();
 }
 

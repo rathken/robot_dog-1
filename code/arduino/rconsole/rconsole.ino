@@ -21,12 +21,7 @@ void loop() {
  if (!c.isInProgress()) {// process next command in command buffer if there is no command in progress
     //    Serial.println("Not busy, checking command buffer");
     if (!c.isEmpty()) { // buffer is not empty
-      c.copyCmdBuffer();
-      c.removeComments();
-      c.printCmd();
-      c.parseCmd();
-      c.clearCmd();
-      c.removeFirstEntry();
+      c.processFirstCmd();
     }
   } else { // some command is in progress
     //TODO
