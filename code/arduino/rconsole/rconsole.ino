@@ -6,18 +6,41 @@
 #include "Config.h"
 #include "Command.h"
 
-Command c;
+
+
+//-----------------------------------------------------------
+// Adafruit PWM controller library
+// PCA9685 16-channel PWM & Servo driver
+//-----------------------------------------------------------
+#ifdef WITH_SERVOS
+  #include <Wire.h>
+  #include <Adafruit_PWMServoDriver.h>
+  Adafruit_PWMServoDriver pwm=Adafruit_PWMServoDriver();;
+#endif
+
+//-----------------------------------------------------------
+// Robot console
+//-----------------------------------------------------------
+Command c(&pwm);
 String tempStr="";
 
+//-----------------------------------------------------------
+// main routines
+//-----------------------------------------------------------
 void setup() {
   Serial.begin(BAUDRATE);
   Serial.println(String(STR_BOOT_MSG));
+#ifdef WITH_SERVOS  
+  ::pwm.begin();
+  ::pwm.setPWMFreq(50);  // Analog servos run at ~50 Hz updates
+#endif
+  delay(10);
   c.sendOK();
 }
 
 void loop() {
  if (!c.isInProgress()) {// process next command in command buffer if there is no command in progress
-    if (!c.isEmpty()) { // buffer is not empty    
+    if (c.commandPending()) { // buffer is not empty    
       c.processFirstCmd();
     }
   } else { // some command is in progress
@@ -28,6 +51,7 @@ void loop() {
       processSerialIn();
     } 
   }
+//  delay(5);
 }
 
 void processSerialIn() {
@@ -36,7 +60,7 @@ void processSerialIn() {
   switch(ch) {
     case 'R':
     case ';':
-            //tempStr+='\n';
+//            tempStr+='\n';
             c.appendCommand(tempStr);
             tempStr=(char)ch;
             break;

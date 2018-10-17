@@ -6,10 +6,11 @@
 #include "Config.h"
 #include <Arduino.h>
 
-Command::Command() {
+Command::Command(Adafruit_PWMServoDriver *p) {
   inProgress=false;
   cmd="";
   cmdIdx=0;
+  r.setPWM(p);
 }
 
 void Command::parseCmd(void) {
@@ -25,21 +26,45 @@ void Command::parseCmd(void) {
     codeNum=findString('r',0);
     switch(codeNum) {
     case 0: 
+    #ifdef WITH_ROBOT
       inProgress=true;
-      Serial.println("R0");
-      inProgress=false;
+      r.init();
+    #endif
       sendOK();
+      inProgress=false;
       break;
+
+#ifdef WITH_ROBOT
+   case 1:
+      inProgress=true;
+      r.pos1();
+      sendOK();
+      inProgress=false;
+      break;
+   case 2:
+      inProgress=true;
+      r.pos2();
+      sendOK();
+      inProgress=false;
+      break;
+   case 3:
+      inProgress=true;
+      r.pos3();
+      sendOK();
+      inProgress=false;
+      break;      
+#endif
+
    case 999:
       inProgress=true;
-      Serial.println("R999");
       showCommands();
-      inProgress=false;
       sendOK();
+      inProgress=false;
       break;      
     default:
       Serial.println("Unknown code");
       sendOK();
+      inProgress=false;
       break;
     }
   }
@@ -96,12 +121,13 @@ void Command::removeComments(void) {
 }
 
 void Command::removeFirstEntry(void) {
-  if (cmdIdx>1) {
+  if (cmdIdx>=1) {
     for(int i=1;i<cmdIdx;i++) { // move the entries up
       strcpy(cmdBuffer[i-1],cmdBuffer[i]);
     }
+    cmdIdx--;
   }
-  cmdIdx--;
+  
 }
 
 void Command::copyCmdBuffer(void) {
@@ -111,9 +137,9 @@ void Command::copyCmdBuffer(void) {
   }
 }
 
-void Command::appendCommand(String &c) {
-  c.toCharArray(cmdBuffer[cmdIdx],MAX_LINE_SIZE);
-  cmdBuffer[cmdIdx][c.length()]=0x00;          // null character at the end
+void Command::appendCommand(String &str) {
+  str.toCharArray(cmdBuffer[cmdIdx],MAX_LINE_SIZE);
+  cmdBuffer[cmdIdx][str.length()]=0x00;          // null character at the end
   cmdIdx++;
 }
 
@@ -123,7 +149,9 @@ void Command::processFirstCmd(void) {
   #ifdef DEBUG_MODE  
     Serial.println("Command : "+cmd);
   #endif
-  parseCmd();
+  if (cmd !="") {
+    parseCmd();
+  }
   cmd="";
   removeFirstEntry();
 }

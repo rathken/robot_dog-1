@@ -10,6 +10,8 @@
 
 #define BAUDRATE 115200
 //The ASCII buffer for recieving from the serial:
-#define MAX_LINE_SIZE 30
-#define NUM_ENTRY  20
+#define MAX_LINE_SIZE 128
+#define NUM_ENTRY  3
 
+#define WITH_ROBOT 
+#define WITH_SERVOS 
