@@ -30,3 +30,5 @@ uint16_t Motor::changePW(int8_t delta) {
 void Motor::revertPW(void) {
   pw=lastPW;
 }
+
+

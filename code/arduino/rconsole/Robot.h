@@ -36,6 +36,7 @@ namespace RobotDog {
     void pos3(void);
     void moveMotors(void);
     void setPWM(Adafruit_PWMServoDriver *p) { pwm=p;}
+    void moveMotors(const String &cmd);
   };
 };
 

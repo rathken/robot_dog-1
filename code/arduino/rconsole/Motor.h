@@ -20,7 +20,6 @@ namespace RobotDog {
     void setChannel(uint8_t ch) { channel=ch;}
     uint16_t changePW(int8_t delta);
     void revertPW(void);
-
   };
 };
 

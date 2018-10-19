@@ -33,8 +33,9 @@ void Command::parseCmd(void) {
       sendOK();
       inProgress=false;
       break;
+#ifdef WITH_ROBOT      
 
-#ifdef WITH_ROBOT
+
    case 1:
       inProgress=true;
       r.pos1();
@@ -53,8 +54,13 @@ void Command::parseCmd(void) {
       sendOK();
       inProgress=false;
       break;      
+   case 4:
+      inProgress=true;
+      r.moveMotors(cmd);
+      inProgress=false;
+      sendOK();
+      break;
 #endif
-
    case 999:
       inProgress=true;
       showCommands();
