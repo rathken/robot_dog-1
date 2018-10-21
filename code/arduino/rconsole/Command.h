@@ -34,6 +34,7 @@ class Command {
     void removeComments(void);
     void parseCmd(void);
     void removeFirstEntry(void);
+    int findInteger(int index);
   public:
     Command(Adafruit_PWMServoDriver *p); 
     // methods
@@ -46,6 +47,7 @@ class Command {
     volatile int getIndex(void) { return cmdIdx;};
     void appendCommand(String &c);
     void processFirstCmd(void);
+    void delayMS(long ms) { if(ms>0) { delay(ms);}}
 };
 
 

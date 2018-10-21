@@ -34,8 +34,6 @@ void Command::parseCmd(void) {
       inProgress=false;
       break;
 #ifdef WITH_ROBOT      
-
-
    case 1:
       inProgress=true;
       r.pos1();
@@ -60,6 +58,12 @@ void Command::parseCmd(void) {
       inProgress=false;
       sendOK();
       break;
+   case 5:
+      inProgress=true;
+      delayMS(findInteger(cmd.indexOf(' ',0)));
+      inProgress=false;
+      sendOK();
+      break;
 #endif
    case 999:
       inProgress=true;
@@ -79,6 +83,34 @@ void Command::showCommands(void) {
   Serial.println("List of commands:");
   Serial.println("R0 [motor number] [motor angle]      : go to position");
   Serial.println("R999                                 : show commands");
+}
+
+
+int Command::findInteger(int index) {
+  bool foundNotSpace=false;
+  bool foundInt=false;
+  String str="";
+  for(int i=index;i<cmd.length();i++) {
+     char ch=cmd.charAt(i);   
+     if (!foundNotSpace) {
+       if (ch!=' ') {
+        foundNotSpace=true;
+        //Serial.println("Found non-space character"+char(ch));
+       } else {
+        continue;
+       }
+     }
+     if (foundNotSpace) {           
+      if (((ch>='0')&&(ch<='9'))||(ch=='-')) {
+        str+=char(ch);
+        foundInt=true;
+      } else {
+       // end of number
+        return ((foundInt)?atoi(str.c_str()):0);
+      }
+     }
+  }
+  return ((foundInt)?atoi(str.c_str()):0);
 }
 
 int Command::findString(char ch,int index) {
