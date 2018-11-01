@@ -1,9 +1,11 @@
+################################################################################
+# Copyright (c) 2018 Chi K. Lee
+# Release under BSD 3-Clause License 
+################################################################################
 import pybullet as p
 import time
 import pybullet_data
-
 import numpy as np
-
 
 ################################################################################
 # This program demonstrates basic joint movements
@@ -11,33 +13,29 @@ import numpy as np
 # TODO: use thread to capture robot states, speed and etc.
 ################################################################################
 
+################################################################################
+# global parameters
+################################################################################
 plot = True
 if (plot):
   import matplotlib.pyplot as plt
-#  figure=plt.figure(figsize=[10,8])
-  figure, ((ax_pos,ay_pos,az_pos),(ax_orn,ay_orn,az_orn)) = plt.subplots(2,3,sharex='col',sharey='row')
-  figure.subplots_adjust(left=0.05, bottom=0.11, right=0.97, top=0.9, wspace=0.4, hspace=0.55)
-  figure.set_size_inches(10,8)
 
-
-  ax_pos.set_title("Body x-location")
-  ay_pos.set_title("Body y-location")
-  az_pos.set_title("Body z-location")
-  ax_orn.set_title("Body x-orientation")
-  ay_orn.set_title("Body y-orientation")
-  az_orn.set_title("Body z-orientation")
 
 #verbose = True
 verbose = False
 
+useFriction=False
+
 # Parameters:
 delta_t = 0.001
 start_sim = 0.0
-steps = 10
+steps = 50
 end_sim = delta_t * steps
-t=[0 for x in range(steps)]
-body_pos = [[ 0. for x in range(steps)] for y in range(3)]
-body_orn = [[ 0. for x in range(steps)] for y in range(3)]
+
+  
+################################################################################
+# functions
+################################################################################
 
 def position(jointIdx1, position1, jointIdx2, position2):
   p.setJointMotorControl2(
@@ -52,7 +50,7 @@ def position(jointIdx1, position1, jointIdx2, position2):
     controlMode=p.POSITION_CONTROL,
     targetPosition=position2,
     force=maxForce)
-
+#-------------------------------------------------------------------------------
 def moveLeg(joint1,joint2):
   position(joint1,0.5,joint2,0.18)
   time.sleep(stepSize)
@@ -62,19 +60,19 @@ def moveLeg(joint1,joint2):
   time.sleep(stepSize)
   position(joint1,0.5,joint2,0.18)
   time.sleep(stepSize)
-  
+#-------------------------------------------------------------------------------  
 def pose0():
   moveLeg(front_left_hip_to_thigh,front_left_thigh_to_leg)
-  
+#-------------------------------------------------------------------------------  
 def pose1():
   moveLeg(rear_right_hip_to_thigh,rear_right_thigh_to_leg)
-
+#-------------------------------------------------------------------------------
 def pose2():
   moveLeg(front_right_hip_to_thigh,front_right_thigh_to_leg)
-
+#-------------------------------------------------------------------------------
 def pose3():
   moveLeg(rear_left_hip_to_thigh,rear_left_thigh_to_leg)
-
+#-------------------------------------------------------------------------------
 def robot_action(robot_state):
   switcher = {
     0: pose0,
@@ -87,27 +85,73 @@ def robot_action(robot_state):
                       #,lambda: "Invalid state")
   # Execute the function
   return func()
+#-------------------------------------------------------------------------------
+def plot_graphs(ax_pos, ax_orn, ax_vel, ax_avel):
+  for i in range(3):
+    ax_pos[i].set_ylim(auto=True)
+    ax_orn[i].set_ylim(auto=True)
+    ax_vel[i].set_ylim(auto=True)
+    ax_avel[i].set_ylim(auto=True)
+    ax_pos[i].plot(body_pos[i], plot_colors[i], lw=1, label=plot_labels[i])
+    ax_orn[i].plot(body_orn[i], plot_colors[i], lw=1, label=plot_labels[i])
+    ax_vel[i].plot(body_vel[i], plot_colors[i], lw=1, label=plot_labels[i])
+    ax_avel[i].plot(body_avel[i], plot_colors[i], lw=1, label=plot_labels[i])  
+#-------------------------------------------------------------------------------
+def create_figure(figure, ax_pos, ax_orn, ax_vel, ax_avel):
+  figure.subplots_adjust(left=0.05, bottom=0.11, right=0.97, top=0.9, wspace=0.4, hspace=0.55)
+  figure.set_size_inches(10,8)
+  ax_pos[0].set_title("Body x-location")
+  ax_pos[1].set_title("Body y-location")
+  ax_pos[2].set_title("Body z-location")
+  ax_orn[0].set_title("Body x-orientation")
+  ax_orn[1].set_title("Body y-orientation")
+  ax_orn[2].set_title("Body z-orientation")
+  ax_vel[0].set_title("Body x-velocity")
+  ax_vel[1].set_title("Body y-velocity")
+  ax_vel[2].set_title("Body z-velocity")
+  ax_avel[0].set_title("Body x-angular velocity")
+  ax_avel[1].set_title("Body y-angular velocity")
+  ax_avel[2].set_title("Body z-angular velocity")
 
-################################################################################
-# plot
-################################################################################
-#plt.ion()
-#img = np.random.rand(200, 320)
-#img = [tandard_normal((50,100))
-#image = plt.imshow(img,interpolation='none',animated=True,label="blah")
-#ax = plt.gca()
-
+#-------------------------------------------------------------------------------
+def read_robot_status(i, body_pos, body_orn, body_vel, body_avel):
+  pos, orn = p.getBasePositionAndOrientation(baseId)
+  vel, avel = p.getBaseVelocity(baseId)
+  for j in range(3):
+    body_pos[j][i]=pos[j]
+    body_orn[j][i]=orn[j]
+    body_vel[j][i]=vel[j]
+    body_avel[j][i]=avel[j]
+  
 ################################################################################
 # PyBullet
 ################################################################################
 
+if (plot):
+  figure, (ax_pos,ax_orn,ax_vel,ax_avel) = plt.subplots(4,3)
+  create_figure(figure, ax_pos, ax_orn, ax_vel, ax_avel)
+
+t=[0 for x in range(steps)]
+body_pos = [[ 0. for x in range(steps)] for y in range(3)]
+body_orn = [[ 0. for x in range(steps)] for y in range(3)]
+body_vel = [[ 0. for x in range(steps)] for y in range(3)]
+body_avel = [[ 0. for x in range(steps)] for y in range(3)]
+plot_colors = ['--r','--g','--b']
+plot_labels = ['x','y','z']
+
 physicsClient = p.connect(p.GUI)#or p.DIRECT for non-graphical version
+cameraDistance=2.0
+cameraPitch=-35.4
+cameraYaw=26.8
+cameraTargetPosition=[0.4,0.2,-0.2]
+p.resetDebugVisualizerCamera(cameraDistance,cameraYaw,cameraPitch,cameraTargetPosition)
 p.setTimeStep(delta_t)
 p.setAdditionalSearchPath(pybullet_data.getDataPath()) #optionally
 p.setGravity(0,0,-9.8)
 p.setRealTimeSimulation(0)
 planeId = p.loadURDF("plane.urdf")
-cubeStartPos = [0,0,0.27]
+#cubeStartPos = [0,0,0.27]
+cubeStartPos = [0,0,0.28]
 cubeStartOrientation = p.getQuaternionFromEuler([0,0,0])
 baseId = p.loadURDF("/home/bb8/robot/git/robot_dog/urdf/quadruped.urdf",cubeStartPos, cubeStartOrientation)
 
@@ -116,8 +160,8 @@ mode = p.POSITION_CONTROL
 numJoints = p.getNumJoints(baseId)
 maxForce=1.96 # 1.96Nm = 20Kg.cm
 if (verbose):
-  cubePos, cubeOrn = p.getBasePositionAndOrientation(baseId)
-  print(cubePos,cubeOrn)
+  basePos, baseOrn = p.getBasePositionAndOrientation(baseId)
+  print(basePos,baseOrn)
   print( "number of joints %s" % numJoints)
 
 jointNameToId = {}
@@ -145,6 +189,25 @@ base_rear_right_joint=jointNameToId['base_rear_right_joint']
 rear_right_hip_to_thigh=jointNameToId['rear_right_hip_to_thigh']
 rear_right_thigh_to_leg=jointNameToId['rear_right_thigh_to_leg']
 
+
+#rollFriction=3
+#p.changeDynamics(baseId,front_left_thigh_to_leg,rollingFriction=rollFriction)
+#p.changeDynamics(baseId,front_right_thigh_to_leg,rollingFriction=rollFriction)
+#p.changeDynamics(baseId,rear_left_thigh_to_leg,rollingFriction=rollFriction)
+#p.changeDynamics(baseId,rear_right_thigh_to_leg,rollingFriction=rollFriction)
+
+
+if (useFriction):
+  latFriction=0.6
+  p.changeDynamics(baseId,front_left_thigh_to_leg,lateralFriction=latFriction)
+  p.changeDynamics(baseId,front_right_thigh_to_leg,lateralFriction=latFriction)
+  p.changeDynamics(baseId,rear_left_thigh_to_leg,lateralFriction=latFriction)
+  p.changeDynamics(baseId,rear_right_thigh_to_leg,lateralFriction=latFriction)
+  p.changeDynamics(planeId,-1,lateralFriction=latFriction)
+  legD = p.getDynamicsInfo(baseId,front_left_thigh_to_leg)
+  legFriction=legD[1]
+  #print("Leg friction = {}".format(legFriction))
+
 legnumbering = [
   base_front_left_joint,
   front_left_hip_to_thigh,
@@ -164,7 +227,7 @@ kd=0.5
 
 
 p.changeDynamics(baseId,-1,mass=2)
-
+#p.changeDynamics(
 dyn = p.getDynamicsInfo(baseId,-1)
 mass=dyn[0]
 friction=dyn[1]
@@ -187,11 +250,12 @@ p.resetJointState(baseId,rear_right_hip_to_thigh,targetValue=pos1)
 p.resetJointState(baseId,rear_right_thigh_to_leg,targetValue=pos2)
 
 #the fixedTimeStep and numSolverIterations are the most important parameters to trade-off quality versus performance
-frequency = 8
+frequency = 20
 fixedTimeStep= 1.0/frequency
 stepSize=fixedTimeStep
 numSolverIterations = 200
 p.setPhysicsEngineParameter(numSolverIterations=numSolverIterations)
+#p.setPhysicsEngineParameter(fixedTimeStep=fixedTimeStep, numSolverIterations=numSolverIterations, numSubSteps=2)
 
 #p.startStateLogging(p.STATE_LOGGING_VIDEO_MP4, "myQuad.mp4")
 
@@ -206,26 +270,15 @@ for i in range (steps):
     break
   else:
     p.stepSimulation()
-    cubePos, cubeOrn = p.getBasePositionAndOrientation(baseId)
-    if (verbose):
-#      print(cubePos,cubeOrn)
-      print(cubePos[0],cubePos[1],cubePos[2])
-      
     if (plot):
-      for j in range (3):
-        body_pos[j][i]=cubePos[j]  # position
-        body_orn[j][i]=cubeOrn[j]  # orientation
+      read_robot_status(i, body_pos, body_orn, body_vel, body_avel)
+        
     robot_action(robot_state)
     robot_state =  (robot_state +1 ) % 4
 
 
 if (plot):
-  ax_pos.plot(body_pos[0], '--r', lw=1, label='x')
-  ay_pos.plot(body_pos[1], '--g', lw=1, label='y')
-  az_pos.plot(body_pos[2], '--b', lw=1, label='z')
-  ax_orn.plot(body_orn[0], '--r', lw=1, label='x')
-  ay_orn.plot(body_orn[1], '--g', lw=1, label='y')
-  az_orn.plot(body_orn[2], '--b', lw=1, label='z')
+  plot_graphs(ax_pos, ax_orn, ax_vel, ax_avel)
 
 plt.show()
 #p.disconnect()
