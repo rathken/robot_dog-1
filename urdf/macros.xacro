@@ -51,7 +51,9 @@
   <xacro:property name="x_offset_thigh_to_leg" value="0.023" />
   <xacro:property name="gap_thigh_to_leg" value="0.015" />
   <xacro:property name="min_angle_leg_joint" value="-${pi/2}" />
-  <xacro:property name="max_angle_leg_joint" value="${pi/2}" />    
+  <xacro:property name="max_angle_leg_joint" value="${pi/2}" />
+  <xacro:property name="friction" value="0.8" />
+
   <!-- ############################################ 
        Macro - leg
        ############################################ -->
@@ -116,7 +118,8 @@
         <geometry>
           <cylinder length="${leg_length}" radius="${leg_radius}"/>
         </geometry>
-        <origin rpy="0 0 0" xyz="0 0 -${leg_length/2}"/>   
+        <origin rpy="0 0 0" xyz="0 0 -${leg_length/2}"/>
+	<contact_coefficients mu="${friction}" />
       </collision>    
       <inertial>
         <mass value="${leg_mass}"/>
