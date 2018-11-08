@@ -11,15 +11,15 @@ def main():
     # create the environment
     env = gym.make("quadruped-v0")
     # create the learning agent
-    model = deepq.models.mlp([16,16])
+    model = deepq.models.mlp([1000,1000,1000,500,250])
 
     # train the agent on the environment
     act = deepq.learn( env, q_func=model,
                        lr=1e-3,
-                       max_timesteps=200000,
+                       max_timesteps=2000000,
                        buffer_size=50000,
                        exploration_fraction=0.1,
-                       exploration_final_eps=0.02,
+                       exploration_final_eps=0.01,
                        print_freq=10,
                        callback=callback
                        )
