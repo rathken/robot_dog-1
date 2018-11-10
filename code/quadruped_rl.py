@@ -1,10 +1,14 @@
+################################################################################
+# Copyright (c) 2018 Chi K. Lee
+# Release under BSD 3-Clause License 
+################################################################################
 import gym
 from baselines import deepq
 import quadruped
 
 def callback(lcl, glb):
-    # stop training if reward exceeds 199
-    is_solved = lcl['t'] > 100 and sum(lcl['episode_rewards'][-101:-1]) / 100 >= 199
+    # stop training if reward exceeds 20
+    is_solved = lcl['t'] > 100 and sum(lcl['episode_rewards'][-101:-1]) / 100 >= 20
     return is_solved
 
 def main():

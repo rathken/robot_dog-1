@@ -1,3 +1,11 @@
+################################################################################
+# Copyright (c) 2018 Chi K. Lee
+# Release under BSD 3-Clause License 
+################################################################################
+''' 
+    In this program, the robot tries to keep the body at the height of 0.275 and
+    as steady as possible.
+'''
 import os
 import math
 import numpy as np
@@ -19,11 +27,16 @@ class QuadrupedEnv(gym.Env):
 
     def __init__(self, render=True):
         self._observation = []
-        self._jointIdMap = [0] *8
         self._episode_count =0
-        self.action_space = spaces.Discrete(96)
-        self.observation_space = spaces.Box(np.array([-math.pi, -math.pi, -5]), 
-                                            np.array([math.pi, math.pi, 5])) # pitch, gyro, com.sp.
+        self.action_space = spaces.Discrete(144) # 12 joints, each with 12 angles
+        # 24 parameters to observe
+        # pos , 3 
+        # orn , 3
+        # linear, 3
+        # angular, 3
+        # joints , 12
+        inf=999
+        self.observation_space = spaces.Box(np.array([-inf]*24),np.array([inf]*24))
         if (render):
             self.physicsClient = p.connect(p.GUI)
         else:
@@ -34,36 +47,9 @@ class QuadrupedEnv(gym.Env):
 
     def _create_joint_map(self):
         numJoints = p.getNumJoints(self.botId)
-        jointNameToId = {}
         for i in range(numJoints):
             jointInfo = p.getJointInfo(self.botId,i)
             jointName=jointInfo[1].decode('UTF-8')
-            jointNameToId[jointName] = jointInfo[0]
-#            print("Joint %d = (%s)" % (i,jointName))
-            if (re.search('front_left_',jointName)):
-                legId=0
-            elif (re.search('front_right_',jointName)):
-                legId=1
-            elif (re.search('rear_left_',jointName)):
-                legId=2
-            elif (re.search('rear_right_',jointName)):
-                legId=3
-            else:
-#                print("Warning: ignore jointName ( %s )" % jointName)
-                legId=-1
-            if (re.search('thigh_to_leg',jointName)):
-                isLegJoint=1
-            elif (re.search('hip_to_thigh',jointName)):                
-                isLegJoint=0
-            else:
-                isLegJoint=-1
-            if ((legId>=0) and (isLegJoint>=0)):
-                jid=legId*2+isLegJoint
-                self._jointIdMap[jid]=i
-#                print("Mapping %d to %d (%s)" %(jid,i,jointName))
-
-#        if (verbose):
-#            print ("Joint : ", jointInfo)
         
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -83,17 +69,12 @@ class QuadrupedEnv(gym.Env):
     def reset(self):
         # reset is called once at initialization of simulation
         self._episode_count +=1        
-#        print("Episode %d" % self._episode_count)
 
         # capture video
         if (True):
             if (self._episode_count % 10 ==1):
                 output_file="episode_%d.mp4" % self._episode_count
                 self._state_log = p.startStateLogging(p.STATE_LOGGING_VIDEO_MP4,output_file)
-            
-        self.vt = 0
-        self.vd = 0
-        self.maxV = 24.6 # 235RPM = 24,609142453 rad/sec
         self._envStepCounter = 0
         self._maxJointForce=1.96 # 1.96Nm = 20Kg.cm
         cameraDistance=2.0
@@ -111,59 +92,59 @@ class QuadrupedEnv(gym.Env):
         self.botId = p.loadURDF("/home/bb8/robot/git/robot_dog/urdf/quadruped.urdf",                          
                                 cubeStartPos,
                                 cubeStartOrientation)
-        self._create_joint_map()
-
         # you *have* to compute and return the observation from reset()
         self._observation = self._compute_observation()
         return np.array(self._observation)
 
     def _move_legs(self, action):
-        # 8 joints , each with 12 angles
-        # total 96 actions (0-95)
-        # range
-        # hip_to_thigh : 0 to pi/2
-        # thing_to_leg : -pi/4 to pi/4
-#        print("Action = {}".format(action))
-        numJoints = 8
+        numJoints = 12
         numAngles = 12
         joint_number = int(action/numAngles)
         joint_position = action % numJoints
-        leg_number = joint_number % 4
-        isLeg = int(joint_number/4)
-#        print("Leg {}, isLeg= {}, angle = {}".format(leg_number,isLeg,joint_position))
-        jid=leg_number*2+isLeg
-#        print("--------------------------------------\n")
         p.setJointMotorControl2(bodyUniqueId=self.botId, 
-                                jointIndex=self._jointIdMap[jid], 
+                                jointIndex=joint_number,
                                 controlMode=p.POSITION_CONTROL,
-                                targetPosition=self._get_joint_angle(isLeg,joint_position,numAngles),
+                                targetPosition=self._get_joint_angle(joint_number,joint_position,numAngles),
                                 force=self._maxJointForce)
-
-    def _get_joint_angle(self,isLeg,pos,max_pos):
-        if (isLeg==1):
-            minAngle=-math.pi/4
-            maxAngle=math.pi/4
-        else:
+        
+    def _get_joint_angle(self,joint_number,pos,max_pos):
+        jointInfo = p.getJointInfo(self.botId,joint_number)
+        jointName=jointInfo[1].decode('UTF-8')
+        if 'hip_to_thigh' in jointName:
             minAngle=0
             maxAngle=math.pi/2
+        else:
+            minAngle=-math.pi/4
+            maxAngle=math.pi/4
         return (maxAngle-minAngle)*pos/(max_pos-1)+minAngle
+    
         
     def _compute_observation(self):
         cubePos, cubeOrn = p.getBasePositionAndOrientation(self.botId)
-        cubeEuler = p.getEulerFromQuaternion(cubeOrn)
+#        cubeEuler = p.getEulerFromQuaternion(cubeOrn)
         linear, angular = p.getBaseVelocity(self.botId)
-        #TODO: observe joint angles
-        return [cubeEuler[0],angular[0],self.vt]
-
+        obs =  [cubePos[0],cubePos[1],cubePos[2],
+                cubeOrn[0],cubeOrn[1],cubeOrn[2],
+                linear[0],linear[1],linear[2],
+                angular[0],angular[1],angular[2]]
+        numJoints=p.getNumJoints(self.botId)
+        for i in range(numJoints):
+            jointPosition,_,_,_=p.getJointState(self.botId,i)
+            obs.append(jointPosition)
+        return obs
+               
+               
     def _compute_reward(self):
         cubePos, cubeOrn = p.getBasePositionAndOrientation(self.botId)
         maxScore=0.15
-        targetZ=0.25
-        return (maxScore-abs(cubePos[2]-targetZ))
+        targetZ=0.275
+        panelty=0.1*(abs(cubeOrn[0])+abs(cubeOrn[1])+abs(cubeOrn[2]))
+        if abs(cubeOrn[0])>0.5 or abs(cubeOrn[1])>0.5 or abs(cubeOrn[2])>0.5 or cubePos[2]<0.15:
+            panelty=20
+        return (maxScore-abs(cubePos[2]-targetZ)-panelty)
 
     def _compute_done(self):
         cubePos, cubeOrn = p.getBasePositionAndOrientation(self.botId)
-#        print("%0.3f, %0.3f" % (cubeOrn[0],cubeOrn[1]))
         if (cubePos[2] < 0.15 or self._envStepCounter >= 1500 or abs(cubeOrn[0])>0.5 or abs(cubeOrn[1])>0.5 or abs(cubeOrn[2])>0.5):
             if (self._episode_count % 10 == 1):
                 p.stopStateLogging(self._state_log)
