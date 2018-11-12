@@ -25,7 +25,7 @@ class QuadrupedEnv(gym.Env):
     }
 
 
-    def __init__(self, render=True):
+    def __init__(self, render=False):
         self._observation = []
         self._episode_count =0
         self.action_space = spaces.Discrete(144) # 12 joints, each with 12 angles
@@ -44,7 +44,27 @@ class QuadrupedEnv(gym.Env):
 
         p.setAdditionalSearchPath(pybullet_data.getDataPath())  # used by loadURDF
         self._seed()
-
+        p.resetSimulation()
+        self._maxJointForce=1.96 # 1.96Nm = 20Kg.cm
+        cameraDistance=1.2
+        cameraPitch=-35.4
+        cameraYaw=26.8
+#        cameraTargetPosition=[0.4,0.2,-0.2]
+        cameraTargetPosition=[0.1,0.07,-0.16]
+        p.resetDebugVisualizerCamera(cameraDistance,cameraYaw,cameraPitch,cameraTargetPosition)
+        p.resetSimulation()
+        p.setGravity(0,0,-9.8) # m/s^2
+        p.setTimeStep(0.01) # sec
+        planeId = p.loadURDF("plane.urdf")
+        path = os.path.abspath(os.path.dirname(__file__))
+        
+        cubeStartPos = [0,0,0.28]
+        cubeStartOrientation = p.getQuaternionFromEuler([0,0,0])
+        self.botId = p.loadURDF("/home/bb8/robot/git/robot_dog/urdf/quadruped.urdf",                          
+                                cubeStartPos,
+                                cubeStartOrientation)
+        self._stateId =p.saveState()
+        
     def _create_joint_map(self):
         numJoints = p.getNumJoints(self.botId)
         for i in range(numJoints):
@@ -70,28 +90,20 @@ class QuadrupedEnv(gym.Env):
         # reset is called once at initialization of simulation
         self._episode_count +=1        
 
+
+        p.restoreState(self._stateId)
+        
         # capture video
         if (True):
             if (self._episode_count % 10 ==1):
+
                 output_file="episode_%d.mp4" % self._episode_count
+                print("Saving video : ",output_file)
                 self._state_log = p.startStateLogging(p.STATE_LOGGING_VIDEO_MP4,output_file)
         self._envStepCounter = 0
-        self._maxJointForce=1.96 # 1.96Nm = 20Kg.cm
-        cameraDistance=2.0
-        cameraPitch=-35.4
-        cameraYaw=26.8
-        cameraTargetPosition=[0.4,0.2,-0.2]
-        p.resetDebugVisualizerCamera(cameraDistance,cameraYaw,cameraPitch,cameraTargetPosition)
-        p.resetSimulation()
-        p.setGravity(0,0,-9.8) # m/s^2
-        p.setTimeStep(0.01) # sec
-        planeId = p.loadURDF("plane.urdf")
-        cubeStartPos = [0,0,0.28]
-        cubeStartOrientation = p.getQuaternionFromEuler([0,0,0])
-        path = os.path.abspath(os.path.dirname(__file__))
-        self.botId = p.loadURDF("/home/bb8/robot/git/robot_dog/urdf/quadruped.urdf",                          
-                                cubeStartPos,
-                                cubeStartOrientation)
+
+        
+
         # you *have* to compute and return the observation from reset()
         self._observation = self._compute_observation()
         return np.array(self._observation)
